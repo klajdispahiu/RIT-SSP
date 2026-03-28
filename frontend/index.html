@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIT Student Study Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <h1>RIT Student Study Platform</h1>
+  <span>AI-powered exercise assistant</span>
+</header>
+
+<main class="main">
+
+  <div class="card">
+    <h2>Upload your study material</h2>
+    <input type="file" id="pdf-input" accept=".pdf">
+    <button class="btn" onclick="uploadPDF()">Upload PDF</button>
+    <p id="upload-status" style="margin-top:0.75rem;font-size:0.85rem;color:#666;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Find exercises</h2>
+    <input type="text" id="exercise-input" placeholder="e.g. 32, 42, 52 page 184">
+    <button class="btn" onclick="fetchExercises()">Find exercises</button>
+  </div>
+
+  <div id="results"></div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
+
+
+
+
