@@ -1,0 +1,56 @@
+{% extends 'study/base.html' %}
+{% block title %}Create Account — RIT SSP{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="brand-mark">SSP</div>
+      <h1>Student Study<br>Platform</h1>
+      <p>Upload your textbooks, get AI-generated solutions, and practice with similar exercises.</p>
+    </div>
+    <div class="auth-dots">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="rit-badge">RIT</div>
+        <h2>Create account</h2>
+        <p>Start your AI-powered study journey</p>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" class="auth-form">
+        {% csrf_token %}
+        <div class="field-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="your_username" required autocomplete="username">
+        </div>
+        <div class="field-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@rit.edu" autocomplete="email">
+        </div>
+        <div class="field-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <div class="field-group">
+          <label for="confirm_password">Confirm password</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn-primary btn-full">Create account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
