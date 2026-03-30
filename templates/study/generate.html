@@ -1,0 +1,97 @@
+{% extends 'study/base.html' %}
+{% load static %}
+{% block title %}Generate — RIT SSP{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+  {% include 'study/sidebar.html' %}
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>AI Generate</h1>
+        <p>Generate exercises and flashcards from your textbooks.</p>
+      </div>
+    </div>
+
+    <div class="generate-layout">
+      <div class="generate-controls">
+
+        <div class="panel">
+          <div class="panel-header"><h2>Setup</h2></div>
+
+          <div class="field-group">
+            <label>Textbook</label>
+            <select id="genDoc">
+              <option value="">— select a document —</option>
+              {% for doc in documents %}
+              <option value="{{ doc.id }}">{% if doc.subject %}[{{ doc.subject }}] {% endif %}{{ doc.original_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="process-row" id="processRow" style="display:none">
+            <div class="process-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Process this textbook for AI first</span>
+            </div>
+            <button class="btn-primary" id="processBtn" onclick="processDocument()" style="padding:0.45rem 0.9rem;font-size:0.82rem">Process</button>
+          </div>
+          <div id="processStatus" class="subject-status hidden"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>Generate exercises</h2></div>
+          <div class="field-group">
+            <label>Topic or chapter</label>
+            <input type="text" id="exTopic" placeholder="e.g. Kirchhoff's laws, Chapter 3">
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Difficulty</label>
+              <select id="exDifficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div class="field-group field-sm">
+              <label>Count</label>
+              <input type="number" id="exCount" value="5" min="1" max="10">
+            </div>
+          </div>
+          <button class="btn-primary btn-full" id="genExBtn" onclick="generateExercises()">Generate exercises</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>Generate flashcards</h2></div>
+          <div class="field-group">
+            <label>Topic or chapter</label>
+            <input type="text" id="fcTopic" placeholder="e.g. Ohm's law, derivatives">
+          </div>
+          <div class="field-group">
+            <label>Number of cards</label>
+            <input type="number" id="fcCount" value="10" min="3" max="20">
+          </div>
+          <button class="btn-primary btn-full" id="genFcBtn" onclick="generateFlashcards()" style="background:#7c3aed">Generate flashcards</button>
+        </div>
+
+      </div>
+
+      <div class="generate-output" id="generateOutput">
+        <div class="results-placeholder" style="height:400px">
+          <div class="placeholder-icon" style="color:#c4c1bb">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p>Select a document and generate exercises or flashcards</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/generate.js' %}"></script>
+{% endblock %}

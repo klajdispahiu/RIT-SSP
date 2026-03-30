@@ -1,0 +1,66 @@
+{% extends 'study/base.html' %}
+{% load static %}
+{% block title %}Subjects — RIT SSP{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+  {% include 'study/sidebar.html' %}
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>Subjects</h1>
+        <p>{{ profile.get_major_display }} — add your textbooks for each subject.</p>
+      </div>
+      <div class="major-badge">{{ profile.major }}</div>
+    </div>
+
+    <div class="subjects-grid">
+      {% for item in subject_data %}
+      <div class="subject-card" id="subject-{{ forloop.counter }}">
+        <div class="subject-header">
+          <div class="subject-icon">{{ forloop.counter }}</div>
+          <div>
+            <h2>{{ item.name }}</h2>
+            <span class="subject-count">{{ item.books.count }} textbook{{ item.books.count|pluralize }}</span>
+          </div>
+        </div>
+
+        {% if item.books %}
+        <div class="subject-books">
+          {% for book in item.books %}
+          <div class="book-item">
+            <div class="book-icon">PDF</div>
+            <div class="book-info">
+              <span class="book-name">{{ book.original_name }}</span>
+              <span class="book-date">Added {{ book.uploaded_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="book-actions">
+              <a href="{% url 'study' %}?doc={{ book.id }}" class="btn-secondary" style="font-size:0.78rem;padding:0.35rem 0.75rem">Study</a>
+              <a href="{% url 'delete_document' book.id %}" class="doc-delete" onclick="return confirm('Delete this textbook?')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="upload-zone subject-upload" data-subject="{{ item.name }}" id="zone-{{ forloop.counter }}">
+          <input type="file" accept=".pdf" hidden class="subject-file-input" id="input-{{ forloop.counter }}">
+          <div class="upload-icon-sm">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <p class="upload-label-sm">Add textbook <span>— click or drop PDF</span></p>
+        </div>
+        <div class="subject-status hidden" id="status-{{ forloop.counter }}"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/subjects.js' %}"></script>
+{% endblock %}
