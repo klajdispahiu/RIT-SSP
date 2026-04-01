@@ -404,22 +404,21 @@ Based ONLY on the following textbook content, create {count} {difficulty}-diffic
 TEXTBOOK CONTENT:
 {context}
 
-INSTRUCTIONS:
-- Each exercise must be directly based on the textbook content above
-- Number each exercise clearly: Exercise 1, Exercise 2, etc.
-- Include a mix of problem types (calculation, conceptual, application)
-- After all exercises, provide an "ANSWERS" section with brief answers for each
-- Keep exercises appropriate for university level
+CRITICAL INSTRUCTIONS:
+- Output ONLY a valid JSON array, absolutely nothing else
+- No markdown, no LaTeX, no dollar signs, no asterisks, no dashes
+- Write all math in plain text: use ^ for powers, sqrt() for roots, -> for limits, * for multiplication
+- Write limits like: lim(x->2) of (x^2 - 4)/(x - 2)
+- Write fractions like: (x^2 + 1) / (x - 3)
+- Each exercise must have: number, question, answer, type
+- type must be one of: calculation, conceptual, application
+- answers must be plain text, no math symbols
 
-Format:
-Exercise 1: [question]
-Exercise 2: [question]
-...
-
-ANSWERS:
-1. [answer]
-2. [answer]
-..."""
+OUTPUT FORMAT (strict JSON, no other text):
+[
+  {{"number": 1, "question": "Find the limit: lim(x->3) of (x^2 - 9)/(x - 3)", "answer": "The limit equals 6. Factor the numerator as (x+3)(x-3), cancel (x-3), then substitute x=3 to get 6.", "type": "calculation"}},
+  {{"number": 2, "question": "Explain what it means for a limit to exist at a point.", "answer": "A limit exists at point a if the function approaches the same value L from both the left and right sides as x approaches a.", "type": "conceptual"}}
+]"""
 
     try:
         client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY'))
@@ -519,6 +518,83 @@ OUTPUT FORMAT (strict JSON array):
     except Exception as e:
         return JsonResponse({'error': f'Generation failed: {str(e)}'}, status=500)
 
+
+@csrf_exempt
+@login_required
+def generate_quiz_view(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    data = json.loads(request.body)
+    doc_id = data.get('document_id')
+    topic = data.get('topic', '').strip()
+    count = min(int(data.get('count', 5)), 10)
+
+    if not doc_id:
+        return JsonResponse({'error': 'document_id is required.'}, status=400)
+    if not topic:
+        return JsonResponse({'error': 'Please enter a topic or chapter.'}, status=400)
+
+    try:
+        doc = Document.objects.get(id=doc_id, user=request.user)
+    except Document.DoesNotExist:
+        return JsonResponse({'error': 'Document not found.'}, status=404)
+
+    try:
+        from .rag import retrieve_relevant_chunks
+        chunks = retrieve_relevant_chunks(doc_id, topic, n_results=10)
+    except Exception as e:
+        return JsonResponse({'error': f'Retrieval failed: {str(e)}'}, status=500)
+
+    if not chunks:
+        return JsonResponse({
+            'error': 'This document has not been processed yet. Please click "Process for AI" first.'
+        }, status=400)
+
+    context = '\n\n'.join([f"[Page {c['page_number']}]: {c['text']}" for c in chunks])
+
+    prompt = f"""You are a university professor creating practice exercises for students.
+
+Based ONLY on the following textbook content, create {count} {difficulty}-difficulty exercises on the topic: "{topic}".
+
+TEXTBOOK CONTENT:
+{context}
+
+INSTRUCTIONS:
+- Each exercise must be directly based on the textbook content above
+- Include a mix of problem types (calculation, conceptual, application)
+- Keep exercises appropriate for university level
+- Output ONLY valid JSON, nothing else
+
+OUTPUT FORMAT (strict JSON array):
+[
+  {{"number": 1, "question": "Full exercise question here", "answer": "Brief answer here", "type": "calculation"}},
+  {{"number": 2, "question": "Full exercise question here", "answer": "Brief answer here", "type": "conceptual"}}
+]
+"""
+
+    try:
+        client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY'))
+        response = client.models.generate_content(
+            model='models/gemini-2.5-flash',
+            contents=prompt
+        )
+        text = response.text.strip()
+        text = re.sub(r'^```json\s*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'^```\s*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\s*```$', '', text)
+        exercises = json.loads(text)
+        return JsonResponse({
+            'success': True,
+            'exercises': exercises,
+            'topic': topic,
+            'source_pages': sorted(set(c['page_number'] for c in chunks)),
+        })
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Could not parse exercises. Try again.'}, status=500)
+    except Exception as e:
+        return JsonResponse({'error': f'Generation failed: {str(e)}'}, status=500)
+    
 @login_required
 def generate_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user, defaults={'major': 'CIT'})

@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/embed/', views.embed_document_view, name='embed_document'),
     path('api/generate-exercises/', views.generate_exercises_view, name='generate_exercises'),
     path('api/generate-flashcards/', views.generate_flashcards_view, name='generate_flashcards'),
+    path('api/generate-quiz/', views.generate_quiz_view, name='generate_quiz'),
 ]
