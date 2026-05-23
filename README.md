@@ -153,3 +153,9 @@ RIT-SSP/
 **Klajdi Spahiu**  
 Rochester Institute of Technology  
 [GitHub](https://github.com/klajdispahiu)
+
+<img width="1131" height="778" alt="Screenshot 2026-05-23 at 6 24 08 PM" src="https://github.com/user-attachments/assets/2a8e13c3-417d-4cd0-b341-4e0bc06b1a42" />
+<img width="1373" height="775" alt="Screenshot 2026-05-23 at 6 24 51 PM" src="https://github.com/user-attachments/assets/63eed0a6-bd0c-496b-be99-666c8a028496" />
+<img width="1347" height="726" alt="Screenshot 2026-05-23 at 6 29 30 PM" src="https://github.com/user-attachments/assets/5ae0ffe7-cd65-446a-8f51-5e6adf8d6386" />
+<img width="1362" height="734" alt="Screenshot 2026-05-23 at 6 25 43 PM" src="https://github.com/user-attachments/assets/bb554bcb-d2b2-4af1-99ba-2c28fe1c30c8" />
+
